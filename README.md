@@ -69,3 +69,15 @@ $ pssh -h hosts.txt -l pirate -t 0 hostname
 [5] 21:34:15 [SUCCESS] dc1-pi01.local
 $
 ```
+
+Perform 'apt-get update' on all the nodes.
+
+```
+$ pssh -h hosts.txt -l pirate -t 0 sudo apt-get update
+[1] 21:37:38 [SUCCESS] dc1-pi03.local
+[2] 21:37:38 [SUCCESS] dc1-pi05.local
+[3] 21:37:38 [SUCCESS] dc1-pi04.local
+[4] 21:37:40 [SUCCESS] dc1-pi01.local
+[5] 21:38:02 [SUCCESS] dc1-pi02.local
+$
+```
