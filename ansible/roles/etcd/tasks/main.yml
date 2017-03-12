@@ -14,8 +14,6 @@
 
 - name: Create systemd unit drop-in file
   template: src=arm.conf dest=/etc/systemd/system/etcd.service.d/arm.conf
-  notify:
-    - restart etcd
 
 - name: install etcd
   apt:
