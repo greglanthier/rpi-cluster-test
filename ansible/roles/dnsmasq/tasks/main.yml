@@ -1,0 +1,11 @@
+- name: install dnsmasq and resolvconf
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - dnsmasq
+    - resolvconf
+    - dnsutils
+
+- name: Setup dnsmasq configuration file
+  template: src=cluster.hosts.conf dest=/etc/dnsmasq.d/cluster.hosts.conf
+  notify:
+    - restart dnsmasq

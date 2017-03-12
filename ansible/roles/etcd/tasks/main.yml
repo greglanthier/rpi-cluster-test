@@ -1,0 +1,20 @@
+- name: add sid debian repo
+  apt_repository:
+    repo: deb http://ftp.ca.debian.org/debian sid main
+    state: present
+
+- name: Ensure systemd unit drop-in dir exists
+  file: path=/etc/systemd/system/etcd.service.d/ state=directory
+
+- name: Create systemd unit drop-in file
+  template: src=arm.conf dest=/etc/systemd/system/etcd.service.d/arm.conf
+  notify:
+    - restart etcd
+
+- name: install etcd
+  apt:
+    name: etcd
+    state: present
+    force: yes
+    autoremove: yes
+    purge: yes

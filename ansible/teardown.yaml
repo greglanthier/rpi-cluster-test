@@ -1,0 +1,10 @@
+---
+- name: Tearing down the teardown
+  hosts: etcd
+  gather_facts: no
+  remote_user: pirate
+  become: true
+  become_method: sudo
+
+  roles:
+    - etcd_teardown

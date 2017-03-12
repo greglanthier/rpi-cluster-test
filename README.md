@@ -49,6 +49,11 @@ Connection to dc1-pi01.local closed.
 $
 ```
 
+Note that if you've re-imaged one of the nodes in the cluster you may need to remove
+stale entries from your ~/.ssh/known_hosts file.
+
+See `ssh-keygen -R hostname [-f known_hosts_file]`.
+
 Repeat for each node.
 
 Confirm that the ssh keys have been setup properly.

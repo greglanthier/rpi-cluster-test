@@ -1,0 +1,16 @@
+---
+- name: Gather details
+  hosts: all
+  remote_user: pirate
+  tasks: []
+
+- name: Setup the setting up
+  hosts: etcd
+  gather_facts: no
+  remote_user: pirate
+  become: true
+  become_method: sudo
+
+  roles:
+    - dnsmasq
+    - etcd

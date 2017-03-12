@@ -1,0 +1,24 @@
+- name: remove sid debian repo
+  apt_repository:
+    repo: deb http://ftp.ca.debian.org/debian sid main
+    state: absent
+
+- name: remove systemd unit override files
+  file:
+    state: "{{ item }}"
+    path: "/etc/systemd/system/etcd.service.d/"
+#    owner: 1000  # set your owner, group, and mode accordingly
+#    group: 1000
+#    mode: '0777'
+  with_items:
+    - absent
+#    - directory
+#  file: path=/etc/systemd/systen/etcd.service.d/ state=absent recurse=no
+
+
+- name: remove etcd
+  apt:
+    name: etcd
+    state: absent
+    autoremove: yes
+    purge: yes
