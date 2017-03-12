@@ -5,7 +5,8 @@
     - resolvconf
     - dnsutils
 
-- name: Setup dnsmasq configuration file
+- name: Setup dnsmasq host records
   template: src=cluster.hosts.conf dest=/etc/dnsmasq.d/cluster.hosts.conf
-  notify:
-    - restart dnsmasq
+  notify: "restart dnsmasq"
+
+- meta: flush_handlers

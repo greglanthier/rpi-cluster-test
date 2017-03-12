@@ -3,6 +3,12 @@
     repo: deb http://ftp.ca.debian.org/debian sid main
     state: present
 
+- name: Setup dnsmasq etcd srv records
+  template: src=etcd.srv.records.conf dest=/etc/dnsmasq.d/etcd.srv.records.conf
+  notify: "restart dnsmasq"
+
+- meta: flush_handlers
+
 - name: Ensure systemd unit drop-in dir exists
   file: path=/etc/systemd/system/etcd.service.d/ state=directory
 
