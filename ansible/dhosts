@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+
+import os, itertools, json
+from collections import OrderedDict
+from subprocess import Popen, PIPE, STDOUT
+from paramiko.client import SSHClient, AutoAddPolicy
+import argparse
+
+def pi_ips():
+	FNULL = open(os.devnull, 'w')
+	with Popen(["/usr/local/bin/fping", "-a", "-q", "-r", "0", "-g", "192.168.0.0/24"], stderr=STDOUT, stdout=FNULL) as proc:
+		outs, errs = proc.communicate(timeout=15)
+
+	with Popen(["arp", "-na"], stderr=STDOUT, stdout=PIPE) as proc:
+		outs, errs = proc.communicate(timeout=15)
+
+		mac = b'b8:27:eb'
+		for line in [x.decode() for x in filter(lambda x: mac in x, outs.splitlines())]:
+			yield line.split(' ')[1][1:-1]
+
+def get_hostname(ip):
+	with SSHClient() as client:
+		client.load_system_host_keys()
+		client.set_missing_host_key_policy(AutoAddPolicy())
+		client.connect(ip, username="pirate")
+		stdin, stdout, stderr = client.exec_command('hostname')
+		line = stdout.read().decode()
+		return line.strip()
+
+def hostnames():
+	for ip in pi_ips():
+		yield (get_hostname(ip), ip)
+
+
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--list',
+                    action='store_true',
+                    help='Ansible dynamic inventory host list')
+
+parser.add_argument('--host', metavar='<hostname>',
+                    help='ignored')
+
+args = parser.parse_args()
+
+d = OrderedDict(sorted(hostnames()))
+m = {'etcd':{'hosts':list(d.keys())[0:3]}}
+
+#print(list(d.keys())[0:3])
+print(json.dumps(m))
