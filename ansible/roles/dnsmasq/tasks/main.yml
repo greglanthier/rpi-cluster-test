@@ -1,12 +1,32 @@
-- name: install dnsmasq and resolvconf
+- name: Install dnsmasq, resolvconf, dnsutils, and avahi-utils
   apt: pkg={{ item }} state=installed
   with_items:
     - dnsmasq
     - resolvconf
     - dnsutils
+    - avahi-utils
 
-- name: Setup dnsmasq host records
-  template: src=cluster.hosts.conf dest=/etc/dnsmasq.d/cluster.hosts.conf
+- name: Copy configuration dropin file
+  copy: src=avahi_hosts.conf dest=/etc/dnsmasq.d/avahi_hosts.conf
   notify: "restart dnsmasq"
 
-- meta: flush_handlers
+- name: Copy avahi_dnsmasq Python driver
+  copy: src=avahi_dnsmasq dest=/usr/local/bin/avahi_dnsmasq mode=0755
+
+- name: Copy systemd files
+  copy: src={{ item }} dest=/lib/systemd/system
+  with_items:
+    - avahi.path
+    - avahi.timer
+    - avahi.service
+
+- name: Enable the service
+  systemd: name={{ item }} enabled=true daemon_reload=true
+  with_items:
+    - avahi.service
+
+- name: Start and enable the path & timer
+  systemd: name={{ item }} state=started enabled=true daemon_reload=true
+  with_items:
+    - avahi.path
+    - avahi.timer

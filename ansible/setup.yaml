@@ -4,8 +4,18 @@
   remote_user: pirate
   tasks: []
 
-- name: Setup the setting up
-  hosts: etcd
+- name: Prepare cluster apt cache
+  hosts: local_repo
+  gather_facts: no
+  remote_user: pirate
+  become: true
+  become_method: sudo
+
+  roles:
+    - apt-cacher-ng
+
+- name: Prepate cluster dns
+  hosts: all
   gather_facts: no
   remote_user: pirate
   become: true
@@ -13,4 +23,3 @@
 
   roles:
     - dnsmasq
-    - etcd

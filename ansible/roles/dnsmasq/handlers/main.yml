@@ -1,5 +1,8 @@
 ---
 # file: roles/common/handlers/main.yml
 - name: restart dnsmasq
-  service: name=dnsmasq state=restarted
+  systemd: name=dnsmasq state=restarted
   listen: "restart dnsmasq"
+
+- name: systemctl daemon-reload
+  systemd: daemon_reload=yes

@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+
+import re, subprocess
+
+ESCAPE_SEQUENCE_RE = re.compile(r'''(\\0[0-9]{1,2})''', re.UNICODE | re.VERBOSE)
+
+def decode_escapes(s):
+    def decode_match(match):
+        return str(unichr(int(match.group(0)[2:])))
+    return ESCAPE_SEQUENCE_RE.sub(decode_match, s)
+
+d = {}
+
+proc = subprocess.Popen(['avahi-browse','-rpt', '_workstation._tcp.'],stdout=subprocess.PIPE,close_fds=True)
+for line in [decode_escapes(x).strip() for x in proc.stdout]:
+  a = line.split(';')
+  if a[0] == '=' and a[1] == 'eth0' and a[2] == 'IPv4':
+    tmp = decode_escapes(a[3])
+    hostname, mac = tmp.split()
+    d[hostname] = a[7]
+
+# TODO: Generate the hosts file in a temp location and then
+# use filecmp to move that temp file to the path monitored by
+# SystemD .path unit in order to avoid triggering dnsmasq reloads
+# when they aren't neccessary.
+
+with open("/run/systemd/avahi.dnsmasqd/hosts", "w") as output:
+  for k in sorted(d):
+    print "%s %s" %(d[k], k)
+    output.write("%s %s\n" % (d[k], k))

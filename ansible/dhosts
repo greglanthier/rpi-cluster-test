@@ -43,7 +43,7 @@ parser.add_argument('--host', metavar='<hostname>',
 args = parser.parse_args()
 
 d = OrderedDict(sorted(hostnames()))
-m = {'etcd':{'hosts':list(d.keys())[0:3]}}
+m = {'etcd':{'hosts':list(d.keys())[0:3]},'all':{'hosts':list(d.keys())}}
 
 #print(list(d.keys())[0:3])
 print(json.dumps(m))

@@ -1,0 +1,8 @@
+- name: Install apt-cacher-ng
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - apt-cacher-ng
+
+- name: Copy passthrough configuration dropin file
+  copy: src=passthrough.conf dest=/etc/apt-cacher-ng/passthrough.conf
+  notify: "restart apt-cacher-ng"

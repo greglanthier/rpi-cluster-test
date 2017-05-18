@@ -1,0 +1,10 @@
+[Unit]
+Description=My Avahi Service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/avahi_dnsmasq > /run/systemd/avahi.dnsmasqd/hosts
+ExecStart=/bin/systemctl reload dnsmasq.service
+
+[Install]
+WantedBy=multi-user.target

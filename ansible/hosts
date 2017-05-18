@@ -1,11 +1,14 @@
-[all]
+[local_repo]
+dc1-pi01.local
+
+[all_1]
 dc1-pi01.local
 dc1-pi02.local
 dc1-pi03.local
 dc1-pi04.local
 dc1-pi05.local
 
-[etcd]
+[etcd_1]
 dc1-pi01.local
 dc1-pi02.local
 dc1-pi03.local

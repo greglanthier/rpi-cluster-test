@@ -11,9 +11,9 @@ sudo mv flash /usr/local/bin/flash
 Flash the SD cards...
 
 ```
-flash --hostname dc1-pi01.local https://github.com/hypriot/image-builder-rpi/releases/download/v1.1.3/hypriotos-rpi-v1.1.3.img.zip
+flash --hostname dc1-pi01 https://github.com/hypriot/image-builder-rpi/releases/download/v1.4.0/hypriotos-rpi-v1.4.0.img.zip
 ...
-flash --hostname dc1-piNN.local https://github.com/hypriot/image-builder-rpi/releases/download/v1.1.3/hypriotos-rpi-v1.1.3.img.zip
+flash --hostname dc1-piNN https://github.com/hypriot/image-builder-rpi/releases/download/v1.4.0/hypriotos-rpi-v1.4.0.img.zip
 ```
 
 Setup password-less login
@@ -84,5 +84,61 @@ $ pssh -h hosts.txt -l pirate -t 0 sudo apt-get update
 [3] 21:37:38 [SUCCESS] dc1-pi04.local
 [4] 21:37:40 [SUCCESS] dc1-pi01.local
 [5] 21:38:02 [SUCCESS] dc1-pi02.local
+$
+```
+
+Maybe we should use avahi to generate dndmasq.conf files on each slave...
+
+```
+$ sudo apt-get install avahi-utils
+$ avahi-browse -rpt _workstation._tcp
++;docker0;IPv4;dc1-pi05\032\091de\058e9\05817\058d3\05887\05886\093;Workstation;local
++;eth0;IPv6;dc1-pi01\032\091b8\05827\058eb\0583d\05810\05899\093;Workstation;local
++;eth0;IPv6;dc1-pi04\032\091b8\05827\058eb\058a5\0588f\058d2\093;Workstation;local
++;eth0;IPv6;dc1-pi02\032\091b8\05827\058eb\05871\0585d\058c2\093;Workstation;local
++;eth0;IPv6;dc1-pi03\032\091b8\05827\058eb\05824\058d5\0586d\093;Workstation;local
++;eth0;IPv6;dc1-pi05\032\091b8\05827\058eb\05886\0584e\058d7\093;Workstation;local
++;eth0;IPv4;dc1-pi04\032\091b8\05827\058eb\058a5\0588f\058d2\093;Workstation;local
++;eth0;IPv4;dc1-pi01\032\091b8\05827\058eb\0583d\05810\05899\093;Workstation;local
++;eth0;IPv4;dc1-pi02\032\091b8\05827\058eb\05871\0585d\058c2\093;Workstation;local
++;eth0;IPv4;dc1-pi03\032\091b8\05827\058eb\05824\058d5\0586d\093;Workstation;local
++;eth0;IPv4;dc1-pi05\032\091b8\05827\058eb\05886\0584e\058d7\093;Workstation;local
+=;eth0;IPv6;dc1-pi04\032\091b8\05827\058eb\058a5\0588f\058d2\093;Workstation;local;dc1-pi04.local;fd00:bc4d:fb76:74f2:ba27:ebff:fea5:8fd2;9;
+=;eth0;IPv4;dc1-pi04\032\091b8\05827\058eb\058a5\0588f\058d2\093;Workstation;local;dc1-pi04.local;192.168.0.21;9;
+=;eth0;IPv6;dc1-pi05\032\091b8\05827\058eb\05886\0584e\058d7\093;Workstation;local;dc1-pi05.local;fd00:bc4d:fb76:74f2:ba27:ebff:fe86:4ed7;9;
+=;docker0;IPv4;dc1-pi05\032\091de\058e9\05817\058d3\05887\05886\093;Workstation;local;dc1-pi05.local;172.17.0.1;9;
+=;eth0;IPv4;dc1-pi05\032\091b8\05827\058eb\05886\0584e\058d7\093;Workstation;local;dc1-pi05.local;192.168.0.23;9;
+=;eth0;IPv6;dc1-pi03\032\091b8\05827\058eb\05824\058d5\0586d\093;Workstation;local;dc1-pi03.local;fd00:bc4d:fb76:74f2:ba27:ebff:fe24:d56d;9;
+=;eth0;IPv4;dc1-pi03\032\091b8\05827\058eb\05824\058d5\0586d\093;Workstation;local;dc1-pi03.local;192.168.0.22;9;
+=;eth0;IPv6;dc1-pi02\032\091b8\05827\058eb\05871\0585d\058c2\093;Workstation;local;dc1-pi02.local;2607:fea8:bd60:88a:ba27:ebff:fe71:5dc2;9;
+=;eth0;IPv4;dc1-pi02\032\091b8\05827\058eb\05871\0585d\058c2\093;Workstation;local;dc1-pi02.local;192.168.0.19;9;
+=;eth0;IPv6;dc1-pi01\032\091b8\05827\058eb\0583d\05810\05899\093;Workstation;local;dc1-pi01.local;2607:fea8:bd60:88a:ba27:ebff:fe3d:1099;9;
+=;eth0;IPv4;dc1-pi01\032\091b8\05827\058eb\0583d\05810\05899\093;Workstation;local;dc1-pi01.local;192.168.0.20;9;
+$
+
+```
+
+```
+$ sudo apt-get install dnsutils
+$ dig dc1-pi05
+```
+
+```
+$ avahi-browse -rpt _workstation._tcp | sort | awk -F';' '$1 == "=" && $2 == "eth0" {printf("%s %s\n", $4, $8)}'
+dc1-pi01\032\091b8\05827\058eb\0583d\05810\05899\093 192.168.0.20
+dc1-pi02\032\091b8\05827\058eb\05871\0585d\058c2\093 192.168.0.19
+dc1-pi03\032\091b8\05827\058eb\05824\058d5\0586d\093 192.168.0.22
+dc1-pi04\032\091b8\05827\058eb\058a5\0588f\058d2\093 192.168.0.21
+dc1-pi05\032\091b8\05827\058eb\05886\0584e\058d7\093 192.168.0.23
+dc1-pi01\032\091b8\05827\058eb\0583d\05810\05899\093 2607:fea8:bd60:88a:ba27:ebff:fe3d:1099
+dc1-pi02\032\091b8\05827\058eb\05871\0585d\058c2\093 2607:fea8:bd60:88a:ba27:ebff:fe71:5dc2
+dc1-pi03\032\091b8\05827\058eb\05824\058d5\0586d\093 fd00:bc4d:fb76:74f2:ba27:ebff:fe24:d56d
+dc1-pi04\032\091b8\05827\058eb\058a5\0588f\058d2\093 fd00:bc4d:fb76:74f2:ba27:ebff:fea5:8fd2
+dc1-pi05\032\091b8\05827\058eb\05886\0584e\058d7\093 fd00:bc4d:fb76:74f2:ba27:ebff:fe86:4ed7
+$
+```
+
+```
+$ sudo apt-get install resolvconf dnsmasq avahi-utils
 $
 ```

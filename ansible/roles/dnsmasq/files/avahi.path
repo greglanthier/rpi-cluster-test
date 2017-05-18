@@ -1,0 +1,10 @@
+[Unit]
+Description=My Avahi Service Path
+Before=paths.target
+RefuseManualStart=true
+RefuseManualStop=true
+
+[Path]
+DirectoryNotEmpty=/run/systemd/avahi.dnsmasqd
+MakeDirectory=yes
+PathModified=/run/systemd/avahi.dnsmasqd
